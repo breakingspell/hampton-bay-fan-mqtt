@@ -36,11 +36,12 @@
 #endif 
 
 // Set CC1101 frequency
-// 303.631 determined from FAN-9T remote tramsmissions
-#define FREQUENCY     303.631
+// 303.9 determined from 7096T remote tramsmissions
+#define FREQUENCY     303.9
 
 // RC-switch settings
 #define RF_PROTOCOL 6
+#define RF_PULSE_LENGTH 320
 #define RF_REPEATS  8
 
 // Define fan states
@@ -117,7 +118,7 @@ void transmitState(int fanId) {
   mySwitch.disableReceive();         // Receiver off
   mySwitch.enableTransmit(TX_PIN);   // Transmit on
   mySwitch.setRepeatTransmit(RF_REPEATS); // transmission repetitions.
-  mySwitch.setProtocol(RF_PROTOCOL);        // send Received Protocol
+  mySwitch.setProtocol(RF_PROTOCOL, RF_PULSE_LENGTH);        // send Received Protocol
 
   // Determine fan component of RF code
   int fanRf = fans[fanId].fanState ? fans[fanId].fanSpeed : 0;
@@ -288,7 +289,7 @@ void loop() {
     Serial.print(" - ");
     Serial.println(bits);
 
-    if( prot == 6 && bits == 21 ) {
+    if(( prot == 6 || prot == 11 ) && bits == 21 ) {
       int id = value >> 14;
       // Got a correct id in the correct protocol
       if(id < 16) {
